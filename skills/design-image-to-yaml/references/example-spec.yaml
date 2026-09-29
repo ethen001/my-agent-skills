@@ -1,0 +1,241 @@
+# Worked example: a SaaS landing hero + feature row, desktop viewport.
+# Produced by following SKILL.md on references/example-input.png.
+
+meta:
+  source: example-input.png
+  image_size: 1440x900
+  viewport_guess: desktop
+  target: html-css
+  confidence:
+    layout: high
+    colors: high          # all values measured with extract_palette.py
+    fonts: medium         # rasterized sans; no font name visible
+    copy: high
+  open_questions:
+    - "Is the header sticky on scroll?"
+    - "The hero right-side panel is an empty light-blue block — screenshot, illustration, or video embed?"
+    - "Feature-card icons are placeholder squares — which icon set?"
+    - "No mobile view supplied; assume header collapses to a menu and cards stack?"
+    - "Does 'Watch demo →' open a modal (button) or link to a page (a)?"
+
+tokens:
+  colors:
+    brand-primary:   { value: "#2563EB", usage: "primary buttons (header CTA, hero CTA)" }
+    brand-primary-hover: { value: "#1D4ED8", usage: "hover for brand-primary", estimated: true }
+    brand-tint:      { value: "#EFF6FF", usage: "hero media panel background" }
+    brand-tint-strong: { value: "#DBEAFE", usage: "feature-card icon chip" }
+    surface:         { value: "#FFFFFF", usage: "page + header + card backgrounds" }
+    surface-alt:     { value: "#F8FAFC", usage: "features section band" }
+    text:            { value: "#0F172A", usage: "logo, headings, secondary button label" }
+    text-nav:        { value: "#334155", usage: "header nav links" }
+    text-muted:      { value: "#64748B", usage: "hero subtitle, card body" }
+    border:          { value: "#E2E8F0", usage: "header bottom rule, card outlines" }
+    border-strong:   { value: "#CBD5E1", usage: "secondary button outline" }
+  fonts:
+    heading:
+      family: "Inter"
+      fallback: "ui-sans-serif, system-ui, -apple-system, sans-serif"
+      evidence: "humanist sans, wide letterforms, double-story a, straight-leg R — could also be DejaVu Sans / Verdana"
+      weights: [700]
+    body:
+      family: "Inter"
+      fallback: "ui-sans-serif, system-ui, sans-serif"
+      weights: [400, 700]
+  type_scale:
+    display: { size: 56, line_height: 1.25, weight: 700 }
+    lead:    { size: 20, line_height: 1.5, weight: 400 }
+    h3:      { size: 20, line_height: 1.3, weight: 700 }
+    logo:    { size: 26, weight: 700 }
+    button:  { size: 17, weight: 700 }
+    nav:     { size: 16, weight: 400 }
+    small:   { size: 14, line_height: 1.5, weight: 400 }
+  spacing:
+    base: 4
+    observed: [8, 16, 20, 24, 40, 60, 90]
+  radii:
+    sm: 8       # buttons, icon chip
+    md: 12      # feature cards
+    lg: 16      # hero media panel
+  shadows: {}   # none observed; cards use a 1px border instead
+
+layout:
+  max_width: 1200          # content spans x=120..1320
+  gutter: 120              # at 1440 wide; use max-width + auto margins rather than fixed gutter
+  grid: { columns: 12, gap: 40 }
+  breakpoints_suggested: { md: 768, lg: 1024 }
+  sections_in_order: [header, hero, features]
+  notes:
+    - "Hero is a 2-column split: text column ~620px, media panel 560x360 at x=760."
+    - "Feature row is 3 equal cards, 360px wide, 40px gap."
+
+structure:
+  - tag: header
+    role: banner
+    classes: [site-header]
+    style: { background: surface, border_bottom: "1px solid border", height: 72, padding: "0 120px" }
+    layout: { display: flex, align: center, justify: space-between }
+    children:
+      - tag: a
+        href: "/"
+        classes: [site-header__logo]
+        copy: header.logo
+        style: { font: heading, size: logo, color: text }
+        note: "Wordmark is text in the design, not an image."
+      - tag: nav
+        aria_label: "Primary"
+        children:
+          - tag: ul
+            classes: [nav-list]
+            layout: { display: flex, gap: 48 }
+            children:
+              - { tag: li, children: [ { tag: a, href: "#", copy: header.nav.product, style: { font: body, size: nav, color: text-nav } } ] }
+              - { tag: li, children: [ { tag: a, href: "#", copy: header.nav.pricing, style: { font: body, size: nav, color: text-nav } } ] }
+              - { tag: li, children: [ { tag: a, href: "#", copy: header.nav.docs,    style: { font: body, size: nav, color: text-nav } } ] }
+              - { tag: li, children: [ { tag: a, href: "#", copy: header.nav.blog,    style: { font: body, size: nav, color: text-nav } } ] }
+      - tag: a
+        href: "#"
+        classes: [btn, btn--primary, btn--sm]
+        copy: header.cta
+        component: btn-primary
+        style: { background: brand-primary, color: surface, radius: sm, padding: "10px 24px", font: body, size: nav, weight: 700 }
+        size: { width: 140, height: 40 }
+
+  - tag: main
+    children:
+      - tag: section
+        classes: [hero]
+        aria_labelledby: hero-title
+        style: { background: surface, padding: "88px 120px 80px" }
+        layout: { display: grid, columns: "1fr 560px", gap: 40, align: start }
+        children:
+          - tag: div
+            classes: [hero__content]
+            note: "Wrapper so the two CTAs and text stack in the left grid column."
+            children:
+              - tag: h1
+                id: hero-title
+                copy: hero.title
+                style: { font: heading, size: display, color: text, margin: "0 0 32px" }
+              - tag: p
+                classes: [hero__lead]
+                copy: hero.subtitle
+                style: { font: body, size: lead, color: text-muted, margin: "0 0 40px", max_width: 580 }
+              - tag: div
+                classes: [hero__actions]
+                layout: { display: flex, gap: 20 }
+                note: "Button group wrapper."
+                children:
+                  - tag: a
+                    href: "#"
+                    classes: [btn, btn--primary]
+                    copy: hero.cta_primary
+                    component: btn-primary
+                    style: { background: brand-primary, color: surface, radius: sm, padding: "14px 30px", font: body, size: button, weight: 700 }
+                    size: { width: 210, height: 52 }
+                  - tag: a
+                    href: "#"
+                    classes: [btn, btn--secondary]
+                    copy: hero.cta_secondary
+                    style: { background: surface, color: text, border: "2px solid border-strong", radius: sm, padding: "14px 28px", font: body, size: button, weight: 400 }
+                    size: { width: 190, height: 52 }
+                    note: "Rendered as <a>; switch to <button> if it opens a video modal (see open_questions)."
+          - tag: div
+            classes: [hero__media]
+            role: img
+            aria_label: "Product preview"
+            style: { background: brand-tint, radius: lg }
+            size: { width: 560, height: 360 }
+            note: "Empty placeholder in design. Replace with <img> or <video> once asset is known."
+
+      - tag: section
+        classes: [features]
+        aria_labelledby: features-title
+        style: { background: surface-alt, padding: "60px 120px" }
+        children:
+          - tag: h2
+            id: features-title
+            classes: [visually-hidden]
+            copy: features.heading_sr
+            note: "Design has no visible section heading; add a visually-hidden one so the section is labelled."
+          - tag: ul
+            classes: [feature-grid]
+            layout: { display: grid, columns: "repeat(3, 1fr)", gap: 40 }
+            children:
+              - tag: li
+                component: feature-card
+                children:
+                  - { tag: span, classes: [feature-card__icon], aria_hidden: true, style: { background: brand-tint-strong, radius: sm }, size: { width: 40, height: 40 }, note: "Icon chip; icon TBD." }
+                  - { tag: h3, copy: features.card_1.title, style: { font: heading, size: h3, color: text } }
+                  - { tag: p,  copy: features.card_1.body,  style: { font: body, size: small, color: text-muted } }
+              - tag: li
+                component: feature-card
+                children:
+                  - { tag: span, classes: [feature-card__icon], aria_hidden: true, style: { background: brand-tint-strong, radius: sm }, size: { width: 40, height: 40 } }
+                  - { tag: h3, copy: features.card_2.title, style: { font: heading, size: h3, color: text } }
+                  - { tag: p,  copy: features.card_2.body,  style: { font: body, size: small, color: text-muted } }
+              - tag: li
+                component: feature-card
+                children:
+                  - { tag: span, classes: [feature-card__icon], aria_hidden: true, style: { background: brand-tint-strong, radius: sm }, size: { width: 40, height: 40 } }
+                  - { tag: h3, copy: features.card_3.title, style: { font: heading, size: h3, color: text } }
+                  - { tag: p,  copy: features.card_3.body,  style: { font: body, size: small, color: text-muted } }
+
+copy:
+  header.logo:         { text: "Ledgerly" }
+  header.nav.product:  { text: "Product" }
+  header.nav.pricing:  { text: "Pricing" }
+  header.nav.docs:     { text: "Docs" }
+  header.nav.blog:     { text: "Blog" }
+  header.cta:          { text: "Get started" }
+  hero.title:
+    text: |
+      Close your books
+      in hours, not weeks
+    note: "Two lines in the design at 1440px; allow natural wrap below lg."
+  hero.subtitle:       { text: "Ledgerly automates reconciliation so your finance team can focus on the numbers that matter." }
+  hero.cta_primary:    { text: "Start free trial" }
+  hero.cta_secondary:  { text: "Watch demo →", note: "Arrow is a text glyph (U+2192), not an icon." }
+  features.heading_sr: { text: "Features", note: "Not in design — screen-reader-only heading." }
+  features.card_1.title: { text: "Auto-match" }
+  features.card_1.body:  { text: "Match 98% of transactions without a human." }
+  features.card_2.title: { text: "Audit trail" }
+  features.card_2.body:  { text: "Every change is logged and exportable." }
+  features.card_3.title: { text: "Bank sync" }
+  features.card_3.body:  { text: "Connects to 12,000+ institutions." }
+
+components:
+  btn-primary:
+    tag: a
+    classes: [btn, btn--primary]
+    style: { background: brand-primary, color: surface, radius: sm, weight: 700 }
+    variants: { sm: "10px 24px / 16px text (header)", md: "14px 30px / 17px text (hero)" }
+    instances: 2
+  feature-card:
+    tag: li
+    classes: [feature-card]
+    style: { background: surface, border: "1px solid border", radius: md, padding: 24 }
+    size: { width: 360, height: 190 }
+    slots: [icon, title, body]
+    instances: 3
+    note: "One React component with icon/title/body props; do not duplicate markup."
+
+interactions:
+  - target: btn--primary
+    hover: { background: brand-primary-hover }
+    focus: "2px outline brand-primary, 2px offset"
+    estimated: true
+  - target: nav-list a
+    hover: { color: text }
+    estimated: true
+
+accessibility:
+  landmarks: [header/banner, nav, main, section×2]
+  heading_order: [h1, h2 (visually hidden), h3, h3, h3]
+  contrast_checks:
+    - { fg: text-muted, bg: surface,       ratio: 4.76, passes: AA }
+    - { fg: text-muted, bg: surface-alt,   ratio: 4.55, passes: AA }
+    - { fg: text-nav,   bg: surface,       ratio: 10.35, passes: AAA }
+    - { fg: surface,    bg: brand-primary, ratio: 5.17, passes: AA }
+  concerns:
+    - "Card body text (#64748B on #FFFFFF card) is 4.76:1 — passes AA at 14px but with little margin; consider #475569."
+    - "Feature-card icon chips have no icon yet; when added, mark decorative (aria-hidden) unless they convey meaning."
